@@ -2,17 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://accounts.google.com https://*.googleapis.com blob: data:;" />
     <title>Redirection</title>
-    <script src="https://apis.google.com/js/api.js"></script>
     <script>
-      // Configuration Google Sheets API
-      const SPREADSHEET_ID = '1-EGzGBogbZv004dt5W9UNIhuQ4H9O-uZObLBlu6vnOc'
-      const API_KEY = 'AIzaSyDqEH3AjVtaQN1gfSuea6eHIINKKfhftIU'
-      const CLIENT_ID = 'qjkn4uo3u1g6gdapmeltpql3l7a0ct8h.apps.googleusercontent.com'
-
       // Fonction de log
       function log(message) {
         console.log(`[${new Date().toISOString()}] ${message}`)
@@ -32,69 +23,46 @@
       const redirectUrl = `${baseUrl}?gid=0#gid=0&user=${user}`
       log(`URL de redirection: ${redirectUrl}`)
 
+      // URL du script Google Apps (à remplacer par l'URL de votre déploiement)
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6ygTpi7D_ZQVQVN31xu744duXCLaMYP2h2J3bhIMfwyijmLoTge8JLSAGgGt3OIyTrQ/exec'
+
       // Fonction de redirection
       function redirect() {
         log('Redirection en cours...')
         window.location.href = redirectUrl
       }
 
-      // Fonction pour initialiser l'API Google Sheets
-      function initGoogleSheetsAPI() {
-        log("Initialisation de l'API Google Sheets...")
-        gapi.client
-          .init({
-            apiKey: API_KEY,
-            clientId: CLIENT_ID,
-            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/sheets/v4/rest'],
-            scope: 'https://www.googleapis.com/auth/spreadsheets',
-          })
-          .then(() => {
-            // Ajout de l'authentification explicite
-            return gapi.auth2.getAuthInstance().signIn()
-          })
-          .then(() => {
-            log('Authentification réussie')
-            // Enregistrer la connexion
-            const timestamp = new Date().toISOString()
-            const values = [[timestamp, user]]
-            log(`Données à enregistrer: Timestamp=${timestamp}, User=${user}`)
+      // Fonction pour enregistrer la connexion
+      function logConnection() {
+        const params = new URLSearchParams({
+          user: user,
+        })
 
-            gapi.client.sheets.spreadsheets.values
-              .append({
-                spreadsheetId: '1kFcIaUQm5o3TGuiK1cPJP7O7Y7yhcFIEcPQuG_ezKnY',
-                range: 'Logs!A:B',
-                valueInputOption: 'RAW',
-                resource: {
-                  values: values,
-                },
-              })
-              .then((response) => {
-                log('Connexion enregistrée avec succès')
-                log(`Réponse API: ${JSON.stringify(response)}`)
-                redirect()
-              })
-              .catch((error) => {
-                log(`Erreur lors de l'enregistrement: ${error.message}`)
-                console.error('Erreur détaillée:', error)
-                document.getElementById('error-message').style.display = 'block'
-                setTimeout(redirect, 50000)
-              })
+        fetch(`${SCRIPT_URL}?${params.toString()}`)
+          .then((response) => response.json())
+          .then((data) => {
+            log(`Réponse du script: ${JSON.stringify(data)}`)
+            if (data.status === 'success') {
+              redirect()
+            } else {
+              throw new Error(data.message)
+            }
           })
           .catch((error) => {
-            log(`Erreur d'initialisation de l'API: ${error}`)
-            console.error("Erreur détaillée d'initialisation:", error)
+            log(`Erreur: ${error.message}`)
+            console.error('Erreur détaillée:', error)
             document.getElementById('error-message').style.display = 'block'
+            setTimeout(redirect, 3000)
           })
       }
 
-      // Charger l'API Google Sheets
-      log("Chargement de l'API Google Sheets...")
-      gapi.load('client:auth2', initGoogleSheetsAPI)
+      // Lancer l'enregistrement
+      logConnection()
     </script>
   </head>
   <body>
     <p>Enregistrement de votre connexion...</p>
     <div id="logs" style="font-family: monospace; margin: 20px; padding: 10px; background-color: #f5f5f5"></div>
-    <p id="error-message" style="display: none; color: red">Une erreur est survenue lors de l'enregistrement. Redirection dans 50 secondes...</p>
+    <p id="error-message" style="display: none; color: red">Une erreur est survenue lors de l'enregistrement. Redirection dans 3 secondes...</p>
   </body>
 </html>
