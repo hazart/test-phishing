@@ -46,7 +46,11 @@
             scope: 'https://www.googleapis.com/auth/spreadsheets',
           })
           .then(() => {
-            log('API initialisée avec succès')
+            // Ajout de l'authentification explicite
+            return gapi.auth2.getAuthInstance().signIn()
+          })
+          .then(() => {
+            log('Authentification réussie')
             // Enregistrer la connexion
             const timestamp = new Date().toISOString()
             const values = [[timestamp, user]]
@@ -74,10 +78,9 @@
               })
           })
           .catch((error) => {
-            log(`Erreur d'initialisation de l'API: ${error.message}`)
+            log(`Erreur d'initialisation de l'API: ${error}`)
             console.error("Erreur détaillée d'initialisation:", error)
             document.getElementById('error-message').style.display = 'block'
-            setTimeout(redirect, 50000)
           })
       }
 
