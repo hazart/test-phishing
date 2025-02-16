@@ -4,38 +4,22 @@
     <meta charset="UTF-8" />
     <title>Redirection</title>
     <script>
-      // Fonction de log
-      function log(message) {
-        console.log(`[${new Date().toISOString()}] ${message}`)
-        const logElement = document.getElementById('logs')
-        if (logElement) {
-          logElement.innerHTML += `<div>${message}</div>`
-        }
-      }
-
       // Récupérer le paramètre 'user' de l'URL
       const urlParams = new URLSearchParams(window.location.search)
       const user = urlParams.get('user') || ''
-      log(`Utilisateur détecté: ${user}`)
-
       // Construire l'URL de redirection avec le paramètre user
       const redirectUrl = 'https://forms.gle/2TVH7DYiydk79GXg9'
-
       // URL du script Google Apps (à remplacer par l'URL de votre déploiement)
       const scriptUrl = 'https://script.google.com/macros/s/AKfycbycJ-RNbC9QJqMRlkXOPUAQVSkF32c4z1sRqaYyyL3_xNicEZ3dmjlG2QZKSOjBNBDwwA/exec?user=' + user
-
       // Fonction de redirection
       function redirect() {
-        log('Redirection en cours...')
         window.location.href = redirectUrl
       }
-
       // Fonction pour enregistrer la connexion
       function logConnection() {
         fetch(scriptUrl)
           .then((response) => response.json())
           .then((data) => {
-            log(`Réponse du script: ${JSON.stringify(data)}`)
             if (data.status === 'success') {
               redirect()
             } else {
@@ -44,10 +28,8 @@
             }
           })
           .catch((error) => {
-            log(`Erreur: ${error.message}`)
             console.error('Erreur détaillée:', error)
-            document.getElementById('error-message').style.display = 'block'
-            // setTimeout(redirect, 3000)
+            setTimeout(redirect, 3000)
           })
       }
       // Lancer l'enregistrement
@@ -55,8 +37,6 @@
     </script>
   </head>
   <body>
-    <p>Enregistrement de votre connexion...</p>
-    <div id="logs" style="font-family: monospace; margin: 20px; padding: 10px; background-color: #f5f5f5"></div>
-    <p id="error-message" style="display: none; color: red">Une erreur est survenue lors de l'enregistrement. Redirection dans 3 secondes...</p>
+    <p>Redirection en cours...</p>
   </body>
 </html>
