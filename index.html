@@ -1,20 +1,69 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8" />
-		<title>Redirection</title>
-		<meta
-			http-equiv="refresh"
-			content="0; URL='https://docs.google.com/spreadsheets/d/1-EGzGBogbZv004dt5W9UNIhuQ4H9O-uZObLBlu6vnOc/edit?gid=0#gid=0'"
-		/>
-	</head>
-	<body>
-		<p>
-			Si vous n'êtes pas redirigé automatiquement,
-			<a
-				href="https://docs.google.com/spreadsheets/d/1-EGzGBogbZv004dt5W9UNIhuQ4H9O-uZObLBlu6vnOc/edit?gid=0#gid=0"
-				>cliquez ici</a
-			>
-		</p>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirection</title>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+      // Configuration Google Sheets API
+      const SPREADSHEET_ID = '1-EGzGBogbZv004dt5W9UNIhuQ4H9O-uZObLBlu6vnOc'
+      const API_KEY = 'VOTRE_CLE_API' // Remplacez par votre clé API
+      const CLIENT_ID = 'VOTRE_CLIENT_ID' // Remplacez par votre Client ID
+
+      // Récupérer le paramètre 'user' de l'URL
+      const urlParams = new URLSearchParams(window.location.search)
+      const user = urlParams.get('user') || ''
+
+      // Construire l'URL de redirection avec le paramètre user
+      const baseUrl = 'https://docs.google.com/spreadsheets/d/1-EGzGBogbZv004dt5W9UNIhuQ4H9O-uZObLBlu6vnOc/edit'
+      const redirectUrl = `${baseUrl}?gid=0#gid=0&user=${user}`
+
+      // Fonction de redirection
+      function redirect() {
+        window.location.href = redirectUrl
+      }
+
+      // Fonction pour initialiser l'API Google Sheets
+      function initGoogleSheetsAPI() {
+        gapi.client
+          .init({
+            apiKey: 'AIzaSyDqEH3AjVtaQN1gfSuea6eHIINKKfhftIU',
+            clientId: 'qjkn4uo3u1g6gdapmeltpql3l7a0ct8h.apps.googleusercontent.com',
+            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+            scope: 'https://www.googleapis.com/auth/spreadsheets',
+          })
+          .then(() => {
+            // Enregistrer la connexion
+            const timestamp = new Date().toISOString()
+            const values = [[timestamp, user]]
+
+            gapi.client.sheets.spreadsheets.values
+              .append({
+                spreadsheetId: SPREADSHEET_ID,
+                range: 'Logs!A:B', // Assurez-vous que cette feuille existe
+                valueInputOption: 'RAW',
+                resource: {
+                  values: values,
+                },
+              })
+              .then((response) => {
+                console.log('Connexion enregistrée')
+                redirect() // Redirection après succès
+              })
+              .catch((error) => {
+                console.error('Erreur:', error)
+                redirect() // Redirection même en cas d'erreur après 3 secondes
+                setTimeout(redirect, 20000)
+              })
+          })
+      }
+
+      // Charger l'API Google Sheets
+      gapi.load('client:auth2', initGoogleSheetsAPI)
+    </script>
+  </head>
+  <body>
+    <p>Enregistrement de votre connexion...</p>
+    <p id="error-message" style="display: none; color: red">Une erreur est survenue lors de l'enregistrement. Redirection dans 3 secondes...</p>
+  </body>
 </html>
