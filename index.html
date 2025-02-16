@@ -19,12 +19,10 @@
       log(`Utilisateur détecté: ${user}`)
 
       // Construire l'URL de redirection avec le paramètre user
-      const baseUrl = 'https://docs.google.com/spreadsheets/d/1kFcIaUQm5o3TGuiK1cPJP7O7Y7yhcFIEcPQuG_ezKnY/edit'
-      const redirectUrl = `${baseUrl}?gid=0#gid=0&user=${user}`
-      log(`URL de redirection: ${redirectUrl}`)
+      const redirectUrl = 'https://forms.gle/2TVH7DYiydk79GXg9'
 
       // URL du script Google Apps (à remplacer par l'URL de votre déploiement)
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6ygTpi7D_ZQVQVN31xu744duXCLaMYP2h2J3bhIMfwyijmLoTge8JLSAGgGt3OIyTrQ/exec'
+      const scriptUrl = 'https://script.google.com/macros/s/AKfycbycJ-RNbC9QJqMRlkXOPUAQVSkF32c4z1sRqaYyyL3_xNicEZ3dmjlG2QZKSOjBNBDwwA/exec?user=' + user
 
       // Fonction de redirection
       function redirect() {
@@ -34,17 +32,14 @@
 
       // Fonction pour enregistrer la connexion
       function logConnection() {
-        const params = new URLSearchParams({
-          user: user,
-        })
-
-        fetch(`${SCRIPT_URL}?${params.toString()}`)
+        fetch(scriptUrl)
           .then((response) => response.json())
           .then((data) => {
             log(`Réponse du script: ${JSON.stringify(data)}`)
             if (data.status === 'success') {
               redirect()
             } else {
+              console.log(data)
               throw new Error(data.message)
             }
           })
@@ -52,10 +47,9 @@
             log(`Erreur: ${error.message}`)
             console.error('Erreur détaillée:', error)
             document.getElementById('error-message').style.display = 'block'
-            setTimeout(redirect, 3000)
+            // setTimeout(redirect, 3000)
           })
       }
-
       // Lancer l'enregistrement
       logConnection()
     </script>
