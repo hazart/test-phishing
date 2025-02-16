@@ -15,7 +15,7 @@
       const user = urlParams.get('user') || ''
 
       // Construire l'URL de redirection avec le paramètre user
-      const baseUrl = 'https://docs.google.com/spreadsheets/d/1-EGzGBogbZv004dt5W9UNIhuQ4H9O-uZObLBlu6vnOc/edit'
+      const baseUrl = 'https://docs.google.com/spreadsheets/d/1kFcIaUQm5o3TGuiK1cPJP7O7Y7yhcFIEcPQuG_ezKnY/edit'
       const redirectUrl = `${baseUrl}?gid=0#gid=0&user=${user}`
 
       // Fonction de redirection
@@ -39,7 +39,7 @@
 
             gapi.client.sheets.spreadsheets.values
               .append({
-                spreadsheetId: SPREADSHEET_ID,
+                spreadsheetId: '1kFcIaUQm5o3TGuiK1cPJP7O7Y7yhcFIEcPQuG_ezKnY',
                 range: 'Logs!A:B', // Assurez-vous que cette feuille existe
                 valueInputOption: 'RAW',
                 resource: {
@@ -52,8 +52,7 @@
               })
               .catch((error) => {
                 console.error('Erreur:', error)
-                redirect() // Redirection même en cas d'erreur après 3 secondes
-                setTimeout(redirect, 20000)
+                setTimeout(redirect, 50000)
               })
           })
       }
